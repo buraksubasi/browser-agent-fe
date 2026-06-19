@@ -5,8 +5,15 @@ import { useAgentStream } from "@/hooks/useAgentStream";
 import { StepCard } from "@/components/StepCard";
 import { StatusBadge } from "@/components/StatusBadge";
 
-const WS_URL =
+const RAW_WS_URL =
   process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/agent/stream";
+
+// HTTPS sayfalarında tarayıcı ws:// bağlantısını reddeder (Mixed Content).
+// Güvenli bağlam tespit edildiğinde ws:// → wss:// otomatik yükselt.
+const WS_URL =
+  typeof window !== "undefined" && window.location.protocol === "https:"
+    ? RAW_WS_URL.replace(/^ws:\/\//, "wss://")
+    : RAW_WS_URL;
 
 const EXAMPLES = [
   "cimri.com'da 'Samsung Galaxy S24 Ultra' ara, en ucuz fiyatları bul",
