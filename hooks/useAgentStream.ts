@@ -1,11 +1,17 @@
 import { useCallback, useRef, useState } from "react";
 
+export type PdfPayload = {
+  filename: string;
+  data: string; // base64
+};
+
 export type StepType = {
   type: "tool_call" | "final" | "done" | "error";
   tool?: string;
   args?: Record<string, unknown>;
   result?: string;
   screenshot?: string;
+  pdf?: PdfPayload;
   text?: string;
   message?: string;
 };
@@ -28,7 +34,12 @@ export function useAgentStream(wsUrl: string) {
       setFinalResult(null);
       setStatus("connecting");
 
-      const ws = new WebSocket(wsUrl);
+      // HTTPS sayfasından ws:// bağlantısı Mixed Content hatası verir; wss:// ye yükselt.
+      const safeUrl =
+        window.location.protocol === "https:"
+          ? wsUrl.replace(/^ws:\/\//, "wss://")
+          : wsUrl;
+      const ws = new WebSocket(safeUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
