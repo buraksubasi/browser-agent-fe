@@ -59,7 +59,7 @@ export function StepCard({ step, index }: { step: StepType; index: number }) {
         </span>
       </div>
 
-      {argsText && !isScreenshot && !isPdf && (
+      {argsText && !isScreenshot && (
         <pre className="mb-2 overflow-x-auto rounded-lg bg-black/30 p-2 text-xs text-slate-300">
           {argsText}
         </pre>
@@ -81,21 +81,29 @@ export function StepCard({ step, index }: { step: StepType; index: number }) {
         </div>
       )}
 
-      {isPdf && step.pdf && (
+      {isPdf && (
         <div className="mt-3 flex items-center gap-3 rounded-xl border border-blue-500/30 bg-blue-950/30 p-3">
           <span className="text-2xl">📄</span>
           <div className="flex-1 min-w-0">
             <p className="truncate text-sm font-medium text-blue-200">
-              {step.pdf.filename}
+              {step.pdf?.filename ?? (step.args?.path as string) ?? "belge.pdf"}
             </p>
-            <p className="text-xs text-blue-400">PDF hazır</p>
+            {step.pdf ? (
+              <p className="text-xs text-blue-400">PDF hazır — indirebilirsin</p>
+            ) : (
+              <p className="text-xs text-slate-400">
+                {step.result ?? "PDF sunucuya kaydedildi"}
+              </p>
+            )}
           </div>
-          <button
-            onClick={() => downloadPdf(step.pdf!.data, step.pdf!.filename)}
-            className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
-          >
-            İndir
-          </button>
+          {step.pdf && (
+            <button
+              onClick={() => downloadPdf(step.pdf!.data, step.pdf!.filename)}
+              className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+            >
+              İndir
+            </button>
+          )}
         </div>
       )}
     </div>
